@@ -16,17 +16,16 @@ output.
       email                 Your valid email address.
     
     optional arguments:
-      -h, --help            show this help message and exit
-      --ra_deg RA_DEG       RA in degrees
-      --dec_deg DEC_DEG     Dec in degrees
-      --field_size_squaredegree FIELD_SIZE_SQUAREDEGREE
-                            Field size in squaredegrees.
-      --data_dir DATA_DIR   Path to directory for table saving
-      --overwrite OVERWRITE
-                            Overwrite download from besancon server.
-      --add_random_gaia_errors ADD_RANDOM_GAIA_ERRORS
-                            Add random errors to parallax and PM assuming Gaia DR2
-                            performances.
-      --random_seed RANDOM_SEED
-                            numpy random seed for error simulation. Allows for
-                            repeatability.
+      -h, --help            show this help message and exit  
+      --ra_deg RA_DEG       RA in degrees  
+      --dec_deg DEC_DEG     Dec in degrees  
+      --field_size_squaredegree FIELD_SIZE_SQUAREDEGREE  
+                            Field size in squaredegrees.  
+      --data_dir DATA_DIR   Path to directory for table saving  
+      --overwrite OVERWRITE Overwrite download from besancon server.  
+      --add_random_gaia_errors ADD_RANDOM_GAIA_ERRORS  
+                            Add random errors to parallax and PM assuming Gaia DR2  
+                            performances.  
+      --random_seed RANDOM_SEED  
+                            numpy random seed for error simulation. Allows for  
+                            repeatability.  

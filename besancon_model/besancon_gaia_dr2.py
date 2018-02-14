@@ -105,7 +105,7 @@ def main(argv):
     besancon_model['Gmag'] = besancon_model['G-V'] + besancon_model['V']
 
     # compute expected DR2 errors, parallaxErrorSkyAvg is in microarcsec
-    dr2_offset = -(60 - 22) / 12
+    dr2_offset = -(60. - 22.) / 12.
     besancon_model['properMotionErrorSkyAvg_dr2_ra_maspyr'], besancon_model['properMotionErrorSkyAvg_dr2_dec_maspyr'] = np.array(properMotionErrorSkyAvg(besancon_model['Gmag'].data, besancon_model['V-I'].data, extension=dr2_offset))/1000.
     besancon_model['parallaxErrorSkyAvg_dr2_mas'] = np.array(parallaxErrorSkyAvg(besancon_model['Gmag'], besancon_model['V-I'], extension=dr2_offset))/1000.
 

@@ -51,6 +51,44 @@ def vminusi_to_gaiacolor(v_minus_i):
     return -0.0660 + 1.2061 * v_minus_i - 0.0614 * v_minus_i**2 + 0.0041 * v_minus_i**3
 
 
+def vminusi_to_gminusbp(v_minus_i):
+    """
+    Return Gaia G-BP color given V-I colour
+    formula is from Jordi+10, Table 3
+
+    :param v_minus_i:
+    :return:
+    """
+
+    return 0.0387 - 0.4191 * v_minus_i - 0.0736 * v_minus_i ** 2 + 0.0040 * v_minus_i ** 3
+
+
+def vminusi_to_gminusrp(v_minus_i):
+    """
+    Return Gaia G-BP color given V-I colour
+    formula is from Jordi+10, Table 3
+
+    :param v_minus_i:
+    :return:
+    """
+
+    return -0.0274 + 0.7870 * v_minus_i - 0.1350 * v_minus_i ** 2 + 0.0082 * v_minus_i ** 3
+
+
+def get_gaia_bp_and_rp(v, v_minus_i):
+
+    gminusv = transformations.gminvFromVmini(v_minus_i)
+    g = gminusv + v
+
+    gminusbp = vminusi_to_gminusbp(v_minus_i)
+    gminusrp = vminusi_to_gminusrp(v_minus_i)
+
+    bp = g - gminusbp
+    rp = g - gminusrp
+
+    return bp, rp
+
+
 def main(argv):
     parser = argparse.ArgumentParser(
         description="This Script downloads a besancon model including include_kinematics using the astroquery interface. Gaia DR2 parallax and proper motion sky-averaged uncertainties are derived using pygaia. Random errors corresponding to Gaia DR2 expectations can be added to the parallaxes and distances of the model output.")
@@ -115,6 +153,8 @@ def main(argv):
     besancon_model['G-V'] = transformations.gminvFromVmini(besancon_model['V-I'])
     besancon_model['Gmag'] = besancon_model['G-V'] + besancon_model['V']
     besancon_model['BP-RP'] = vminusi_to_gaiacolor(besancon_model['V-I'])
+    besancon_model['BP'], besancon_model['RP'] = get_gaia_bp_and_rp(besancon_model['V'], besancon_model['V-I'])
+    # print(besancon_model['BP']-besancon_model['RP'] - besancon_model['BP-RP'])
 
     # compute expected DR2 errors, parallaxErrorSkyAvg is in microarcsec
     dr2_offset = -(60. - 22.) / 12.

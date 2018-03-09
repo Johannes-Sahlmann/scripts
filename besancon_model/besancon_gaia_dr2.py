@@ -106,6 +106,8 @@ def main(argv):
 
     args = parser.parse_args(argv)
 
+    email = args.email
+
     # central pointing and field size
     ra_deg = args.ra_deg
     dec_deg = args.dec_deg
@@ -164,7 +166,7 @@ def main(argv):
     besancon_model['parallax_mas'] = 1./besancon_model['Dist'] # 'Dist' is in kpc
 
     # coordinates are constant and equal to the central pointing in the standard output
-    ecliptic_coords = SkyCoord(besancon_model['b'], besancon_model['l'], 'barycentrictrueecliptic', unit='deg')
+    ecliptic_coords = SkyCoord(besancon_model['l'], besancon_model['b'], 'barycentrictrueecliptic', unit='deg')
     besancon_model['ra_deg'] = ecliptic_coords.icrs.ra.value
     besancon_model['dec_deg'] = ecliptic_coords.icrs.dec.value
 

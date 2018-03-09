@@ -103,6 +103,11 @@ def main(argv):
                         help='Add random errors to parallax and PM assuming Gaia DR2 performances.')
     parser.add_argument('--random_seed', type=int, default=None,
                         help='numpy random seed for error simulation. Allows for repeatability.')
+    # parser.add_argument('--argument_dict', type=, default=None,
+    #                     help='Dictionary of arguments passed to Besancon.query. See Besancon.query documentation for allowed values and format.')
+    parser.add_argument('--vmag_upper_limit', type=float, default=None,
+                        help='V mag upper limit passed to Besancon.query. Default is 18')
+
 
     args = parser.parse_args(argv)
 
@@ -117,6 +122,9 @@ def main(argv):
     overwrite = args.overwrite
     random_seed = args.random_seed
     add_random_gaia_errors = args.add_random_gaia_errors
+    # argument_dict = args.argument_dict
+    # vmag_limits = args.vmag_limits
+    vmag_upper_limit = args.vmag_upper_limit
 
     galactic_latitude_deg=None
     galactic_longitude_deg=None
@@ -140,11 +148,23 @@ def main(argv):
         else:
             kwd['klee'] = 1  #ra/dec
 
+    # merge two dictionaries of arguments
+    # if argument_dict is not None:
+    #     kwd = {**kwd, **argument_dict}
+    # if vmag_limits is not None:
+    #     kwd['mag_limits'] = {'V': vmag_limits}
+
     # execute the query and save into astropy table on disk
     table_file = os.path.join(data_dir, 'besancon_table_{:3.2f}_{:3.2f}_{:3.2f}.csv'.format(galactic_longitude_deg, galactic_latitude_deg, field_size_squaredegree))
 
     if (not os.path.isfile(table_file)) | (overwrite):
-        besancon_model = Besancon.query(glon=galactic_longitude_deg, glat=galactic_latitude_deg, email=email, retrieve_file=False, area=field_size_squaredegree, **kwd)
+        if vmag_upper_limit is not None:
+            # print(vmag_upper_limit)
+            mag_limits = {'V': (10, vmag_upper_limit)}
+            besancon_model = Besancon.query(glon=galactic_longitude_deg, glat=galactic_latitude_deg, email=email, retrieve_file=False, area=field_size_squaredegree, mag_limits=mag_limits, **kwd)
+            # print('Faintest V magnitude = {}'.format(np.max(besancon_model['V'])))
+        else:
+            besancon_model = Besancon.query(glon=galactic_longitude_deg, glat=galactic_latitude_deg, email=email, retrieve_file=False, area=field_size_squaredegree, **kwd)
         besancon_model.write(table_file, format='ascii.fixed_width', delimiter=',', bookend=False)
     else:
         besancon_model = Table.read(table_file, format='ascii.basic', delimiter=',')

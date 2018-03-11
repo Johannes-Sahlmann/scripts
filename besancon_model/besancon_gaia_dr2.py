@@ -131,8 +131,8 @@ def main(argv):
 
     if (galactic_latitude_deg is None) and (galactic_longitude_deg is None):
         equatorial_coordinates = SkyCoord(ra=ra_deg*u.deg, dec=dec_deg*u.deg)
-        galactic_longitude_deg = equatorial_coordinates.barycentrictrueecliptic.lon.value
-        galactic_latitude_deg = equatorial_coordinates.barycentrictrueecliptic.lat.value
+        galactic_longitude_deg = equatorial_coordinates.galactic.l.value
+        galactic_latitude_deg = equatorial_coordinates.galactic.b.value
 
     include_kinematics = True
     pm_in_lb = False # flag to obtain proper motions in galactic coordinates instead of equatorial
@@ -186,9 +186,9 @@ def main(argv):
     besancon_model['parallax_mas'] = 1./besancon_model['Dist'] # 'Dist' is in kpc
 
     # coordinates are constant and equal to the central pointing in the standard output
-    ecliptic_coords = SkyCoord(besancon_model['l'], besancon_model['b'], 'barycentrictrueecliptic', unit='deg')
-    besancon_model['ra_deg'] = ecliptic_coords.icrs.ra.value
-    besancon_model['dec_deg'] = ecliptic_coords.icrs.dec.value
+    galactic_coords = SkyCoord('galactic', l=besancon_model['l'], b=besancon_model['b'], unit='deg')
+    besancon_model['ra_deg'] = galactic_coords.icrs.ra.value
+    besancon_model['dec_deg'] = galactic_coords.icrs.dec.value
 
     if pm_in_lb is False:
         # mux,muy are in arcsec/century

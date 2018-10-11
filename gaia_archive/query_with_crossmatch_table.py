@@ -6,21 +6,37 @@ Authors
     Johannes Sahlmann
 
 """
+from collections import OrderedDict
 import os
 
 from astroquery.gaia import Gaia
 import astropy.units as u
 from astropy.table import Table
 
-field_radius = 5*u.arcmin
+overwrite = True
+# overwrite = True
+
+field_radius = 10*u.arcmin
 
 field_number = 1
 ra_deg = 240.634
 dec_deg = -11.012
 
-output_file = os.path.join(os.environ['HOME'], 'gaia_query_field{:02d}.vot'.format(field_number))
 
-query = """SELECT * from
+data = OrderedDict()
+data['gaia'] = OrderedDict()
+data['tmass'] = OrderedDict()
+data['xmatch'] = OrderedDict()
+
+data['gaia']['query'] = """SELECT * FROM gaiadr2.gaia_source AS gaia
+                        WHERE 1=CONTAINS(POINT('ICRS',gaia.ra,gaia.dec), CIRCLE('ICRS',{}, {}, {}))
+                        """.format(ra_deg, dec_deg, field_radius.to(u.deg).value)
+
+data['tmass']['query'] = """SELECT * FROM gaiadr1.tmass_original_valid AS tmass
+                        WHERE 1=CONTAINS(POINT('ICRS',tmass.ra,tmass.dec), CIRCLE('ICRS',{}, {}, {}))
+                        """.format(ra_deg, dec_deg, field_radius.to(u.deg).value)
+
+data['xmatch']['query'] = """SELECT * from
             (SELECT gaia.*
             FROM gaiadr2.gaia_source AS gaia
             WHERE 1=CONTAINS(POINT('ICRS',gaia.ra,gaia.dec), CIRCLE('ICRS',{}, {}, {})))
@@ -32,10 +48,14 @@ query = """SELECT * from
         """.format(ra_deg, dec_deg, field_radius.to(u.deg).value)
 
 
-if not os.path.isfile(output_file):
-    job = Gaia.launch_job_async(query, dump_to_file=True, output_file=output_file)
-    table = job.get_results()
-else:
-    table = Table.read(output_file)
-print('Retrieved {} sources'.format(len(table)))
-table.pprint()
+for key in data.keys():
+    output_file = os.path.join(os.environ['HOME'], '{}_query_field{:02d}_{}.vot'.format(key, field_number, field_radius).replace(' ',''))
+
+
+    if (not os.path.isfile(output_file)) or (overwrite):
+        job = Gaia.launch_job_async(data[key]['query'], dump_to_file=True, output_file=output_file)
+        table = job.get_results()
+    else:
+        table = Table.read(output_file)
+    print('Retrieved {} sources for catalog {}'.format(len(table), key))
+    # table.pprint()

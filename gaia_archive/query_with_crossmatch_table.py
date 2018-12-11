@@ -41,7 +41,7 @@ data['xmatch']['query'] = """SELECT * from
             FROM gaiadr2.gaia_source AS gaia
             WHERE 1=CONTAINS(POINT('ICRS',gaia.ra,gaia.dec), CIRCLE('ICRS',{}, {}, {})))
             AS field
-            INNER JOIN gaiadr1.tmass_best_neighbour AS xmatch
+            INNER JOIN gaiadr2.tmass_best_neighbour AS xmatch
                 ON field.source_id = xmatch.source_id
             INNER JOIN gaiadr1.tmass_original_valid AS tmass
                 ON tmass.tmass_oid = xmatch.tmass_oid
